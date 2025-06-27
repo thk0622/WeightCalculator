@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weight Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f4f4f4;
+    }
+
+    .container {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      width: 90%;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 16px;
+      color: #333;
+      text-align: center;
+    }
+
+    label {
+      font-weight: bold;
+      margin-top: 10px;
+      display: block;
+    }
+
+    input[type="number"], select {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .reset-btn {
+      background-color: #dc3545;
+    }
+
+    .reset-btn:hover {
+      background-color: #b02a37;
+    }
+
+    ul {
+      padding-left: 0;
+    }
+
+    ul li {
+      list-style: none;
+      padding: 6px;
+      background: #f1f1f1;
+      margin: 4px 0;
+      border-radius: 6px;
+    }
+
+    .result {
+      margin-top: 16px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Weight Calculator (kg)</h1>
+
+    <label for="observedWeight">Observed Weight:</label>
+    <input type="number" id="observedWeight" placeholder="Enter total weight (kg)" step="0.01" min="0" />
+
+    <label for="objectDropdown">Objects:</label>
+    <select id="objectDropdown">
+      <option value="" disabled selected>Select an object</option>
+    </select>
+    <button id="addWeightBtn">Add Object</button>
+
+    <ul id="objectWeightsList"></ul>
+
+    <button id="calculateBtn">Calculate Net Weight</button>
+    <button id="resetBtn" class="reset-btn">Reset</button>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const objectDatabase = {
+        "Box": 2.5,
+        "Bag": 1.2,
+        "Crate": 4.7,
+        "Bucket": 3.8,
+        "Pallet": 10.0
+      };
+
+      const objectDropdown = document.getElementById('objectDropdown');
+      const objectWeightsList = document.getElementById('objectWeightsList');
+      const resultDiv = document.getElementById('result');
+      const observedWeightInput = document.getElementById('observedWeight');
+      const addWeightBtn = document.getElementById('addWeightBtn');
+      const calculateBtn = document.getElementById('calculateBtn');
+      const resetBtn = document.getElementById('resetBtn');
+
+      let objectWeights = [];
+
+      // Populate dropdown
+      Object.keys(objectDatabase).forEach(object => {
+        const option = document.createElement('option');
+        option.value = object;
+        option.textContent = `${object} (${objectDatabase[object]} kg)`;
+        objectDropdown.appendChild(option);
+      });
+
+      // Add object to list
+      addWeightBtn.addEventListener('click', () => {
+        const selectedObject = objectDropdown.value;
+        if (selectedObject) {
+          const weight = objectDatabase[selectedObject];
+          objectWeights.push(weight);
+          const listItem = document.createElement('li');
+          listItem.textContent = `${selectedObject}: ${weight.toFixed(2)} kg`;
+          objectWeightsList.appendChild(listItem);
+          objectDropdown.value = '';
+        } else {
+          alert('Please select an object.');
+        }
+      });
+
+      // Calculate net weight
+      calculateBtn.addEventListener('click', () => {
+        const observedWeight = parseFloat(observedWeightInput.value);
+        if (!isNaN(observedWeight) && observedWeight > 0) {
+          const totalObjectWeight = objectWeights.reduce((sum, w) => sum + w, 0);
+          const netWeight = observedWeight - totalObjectWeight;
+          resultDiv.textContent = `Net Weight: ${netWeight.toFixed(2)} kg`;
+        } else {
+          alert('Enter a valid observed weight.');
+        }
+      });
+
+      // Reset
+      resetBtn.addEventListener('click', () => {
+        observedWeightInput.value = '';
+        objectWeights = [];
+        objectWeightsList.innerHTML = '';
+        resultDiv.textContent = '';
+        objectDropdown.value = '';
+      });
+    });
+  </script>
+</body>
+</html>
