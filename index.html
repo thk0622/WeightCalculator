@@ -79,138 +79,147 @@
     <button id="resetBtn" class="reset-btn">Reset</button>
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Object database (kg)
-      const objectDatabase = {
-        "Blanket": 0.675,
-        "Pillow (with case)": 0.63,
-        "Pillowcase Only": 0.035,
-        "Washcloth": 0.11,
-        "Towel": 0.215,
-        "Z-flo Foam Pillow Large": 1.25,
-        "Z-flo Foam Pillow Small": 0.66,
-        "WAFFLE pillow": 0.255,
-        "Full Swing": 1.8,
-        "Bed pad": 0.585,
-        "Standard Gown": 0.317,
-        "Bariatric Gown": 0.417,
-        "Bed Sheet": 0.38,
-        "Bariatric Bed Sheet": 0.79,
-        "Dryflow pad (standard size)": 0.12,
-        "Dryflow pad (full lenght)": 0.199,
-        "Chux or blue pads": 0.025,
-        "Locked Restraint (each)": 0.393,
-        "Restraint (pair)": 0.13,
-        "Bariatric Sock (pair)": 0.08,
-        "Gray Socks (pair)": 0.044,
-        "Abductor pillow": 1.05,
-        "heel Medix boot + wedge, standard": 0.469,
-        "Sage Boot, pediatric": 0.333,
-        "PFS small": 0.6,
-        "PFS medium": 0.7,
-        "PFS large": 0.8,
-        "Knee Immobilizer 20 in": 0.5,
-        "Knee Immobilizer 22 in": 0.8,
-        "Freedom Splint": 0.165,
-        "Mittens, Adult": 0.165,
-        "Waist Restraint": 0.538,
-        "SCD full set with machine": 6.6,
-        "Cooling Blanket": 1.5,
-        "Male Urinal": 0.04,
-        "Female Urinal": 0.081,
-        "Seizure pads (2)": 1.680,
-        "Prevalon air pump": 6.5,
-        "Airtap Sheet": 0.91,
-        "Airtap Sheet XXL": 0.95,
-        "Airtap Wedge REG (2 piece)": 0.871
-        "Airtap Wedges XXL (2 piece)": 1.04
-      };
+ <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // --- Object database (kg) ---
+    const objectDatabase = {
+      "Blanket": 0.675,
+      "Pillow (with case)": 0.63,
+      "Pillowcase Only": 0.035,
+      "Washcloth": 0.11,
+      "Towel": 0.215,
+      "Z-flo Foam Pillow Large": 1.25,
+      "Z-flo Foam Pillow Small": 0.66,
+      "WAFFLE pillow": 0.255,
+      "Full Swing": 1.8,
+      "Bed pad": 0.585,
+      "Standard Gown": 0.317,
+      "Bariatric Gown": 0.417,
+      "Bed Sheet": 0.38,
+      "Bariatric Bed Sheet": 0.79,
+      "Dryflow pad (standard size)": 0.12,
+      "Dryflow pad (full lenght)": 0.199,
+      "Chux or blue pads": 0.025,
+      "Locked Restraint (each)": 0.393,
+      "Restraint (pair)": 0.13,
+      "Bariatric Sock (pair)": 0.08,
+      "Gray Socks (pair)": 0.044,
+      "Abductor pillow": 1.05,
+      "heel Medix boot + wedge, standard": 0.469,
+      "Sage Boot, pediatric": 0.333,
+      "PFS small": 0.6,
+      "PFS medium": 0.7,
+      "PFS large": 0.8,
+      "Knee Immobilizer 20 in": 0.5,
+      "Knee Immobilizer 22 in": 0.8,
+      "Freedom Splint": 0.165,
+      "Mittens, Adult": 0.165,
+      "Waist Restraint": 0.538,
+      "SCD full set with machine": 6.6,
+      "Cooling Blanket": 1.5,
+      "Male Urinal": 0.04,
+      "Female Urinal": 0.081,
+      "Seizure pads (2)": 1.680,
+      "Prevalon air pump": 6.5,
+      "Airtap Sheet": 0.98,
+      "Airtap Sheet XXL": 0.95,
+      "Airtap Wedge (2 piece)": 0.871
+    };
 
-      // Elements
-      const objectDropdown = document.getElementById('objectDropdown');
-      const listEl = document.getElementById('objectWeightsList');
-      const resultEl = document.getElementById('result');
-      const tareEl = document.getElementById('tare');
-      const obsEl = document.getElementById('obs');
-      const observedWeightInput = document.getElementById('observedWeight');
-      const addWeightBtn = document.getElementById('addWeightBtn');
-      const resetBtn = document.getElementById('resetBtn');
+    // --- Elements ---
+    const objectDropdown = document.getElementById('objectDropdown');
+    const listEl = document.getElementById('objectWeightsList');
+    const resultEl = document.getElementById('result');
+    const tareEl = document.getElementById('tare') || (()=>{ const d=document.createElement('div'); return d; })();
+    const obsEl = document.getElementById('obs') || (()=>{ const d=document.createElement('div'); return d; })();
+    const observedWeightInput = document.getElementById('observedWeight');
+    const addWeightBtn = document.getElementById('addWeightBtn');
+    const resetBtn = document.getElementById('resetBtn');
 
-      // State
-      let items = []; // [{ name, weight }]
-      let observed = 0;
+    // --- State ---
+    let items = []; // [{ name, weight }]
+    let observed = 0;
 
-      // Populate dropdown
-      Object.keys(objectDatabase).forEach(object => {
-        const option = document.createElement('option');
-        option.value = object;
-        option.textContent = `${object} (${objectDatabase[object]} kg)`;
-        objectDropdown.appendChild(option);
-      });
-
-      // Recalc and render totals + list
-      function recalcAndRender() {
-        const tare = items.reduce((sum, it) => sum + it.weight, 0);
-        const net = observed - tare;
-
-        tareEl.textContent = `${tare.toFixed(2)} kg`;
-        obsEl.textContent = `${observed.toFixed(2)} kg`;
-        resultEl.textContent = `Net Weight: ${net.toFixed(2)} kg`;
-
-        listEl.innerHTML = '';
-        items.forEach((it, idx) => {
-          const li = document.createElement('li');
-
-          const lbl = document.createElement('span');
-          lbl.className = 'item-label';
-          lbl.textContent = `${it.name}: ${it.weight.toFixed(2)} kg`;
-
-          const removeBtn = document.createElement('button');
-          removeBtn.className = 'remove-btn';
-          removeBtn.setAttribute('aria-label', 'Remove item');
-          removeBtn.textContent = '×';
-          removeBtn.onclick = () => {
-            items.splice(idx, 1);
-            recalcAndRender();
-          };
-
-          li.append(lbl, removeBtn);
-          listEl.appendChild(li);
-        });
-      }
-
-      // Add object; keep dropdown selection for repeated adds
-      addWeightBtn.addEventListener('click', () => {
-        const selectedObject = objectDropdown.value;
-        if (!selectedObject) {
-          alert('Please select an object.');
-          return;
+    // Populate dropdown safely
+    function populateDropdown() {
+      try {
+        objectDropdown.innerHTML = '<option value="" disabled selected>Select an object</option>';
+        const entries = Object.entries(objectDatabase);
+        if (!entries.length) throw new Error('Empty object database');
+        for (const [name, weight] of entries) {
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = `${name} (${weight} kg)`;
+          objectDropdown.appendChild(opt);
         }
-        items.push({ name: selectedObject, weight: objectDatabase[selectedObject] });
-        recalcAndRender();
-        // Do not clear dropdown so user can tap Add again
-      });
+      } catch (e) {
+        // Visible fallback if something blocks JS on device
+        objectDropdown.innerHTML = '<option value="" disabled selected>Objects unavailable</option>';
+      }
+    }
 
-      // Observed weight input => live recalc
-      observedWeightInput.addEventListener('input', () => {
-        const v = parseFloat(observedWeightInput.value);
-        observed = Number.isFinite(v) && v >= 0 ? v : 0;
-        recalcAndRender();
-      });
+    // Recalc & render
+    function recalcAndRender() {
+      const tare = items.reduce((sum, it) => sum + it.weight, 0);
+      const net = (observed || 0) - tare;
 
-      // Reset everything
-      resetBtn.addEventListener('click', () => {
-        if (!confirm('Clear observed weight and all objects?')) return;
-        observed = 0;
-        items = [];
-        observedWeightInput.value = '';
-        recalcAndRender();
-      });
+      if (tareEl) tareEl.textContent = `${tare.toFixed(2)} kg`;
+      if (obsEl)  obsEl.textContent  = `${(observed || 0).toFixed(2)} kg`;
+      if (resultEl) resultEl.textContent = `Net Weight: ${net.toFixed(2)} kg`;
 
-      // Init render
+      listEl.innerHTML = '';
+      items.forEach((it, idx) => {
+        const li = document.createElement('li');
+
+        const lbl = document.createElement('span');
+        lbl.className = 'item-label';
+        lbl.textContent = `${it.name}: ${it.weight.toFixed(2)} kg`;
+
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'remove-btn';
+        removeBtn.setAttribute('aria-label', 'Remove item');
+        removeBtn.textContent = '×';
+        removeBtn.onclick = () => {
+          items.splice(idx, 1);
+          recalcAndRender();
+        };
+
+        li.append(lbl, removeBtn);
+        listEl.appendChild(li);
+      });
+    }
+
+    // Events
+    addWeightBtn.addEventListener('click', () => {
+      const selected = objectDropdown.value;
+      if (!selected) { alert('Please select an object.'); return; }
+      const weight = objectDatabase[selected];
+      // guard if key missing (e.g., old cached code)
+      if (typeof weight !== 'number') { alert('Object weight not found. Try a hard refresh.'); return; }
+      items.push({ name: selected, weight });
+      recalcAndRender();
+      // Do NOT clear dropdown; user can tap Add again
+    });
+
+    observedWeightInput.addEventListener('input', () => {
+      const v = parseFloat(observedWeightInput.value);
+      observed = Number.isFinite(v) && v >= 0 ? v : 0;
       recalcAndRender();
     });
-  </script>
+
+    resetBtn.addEventListener('click', () => {
+      if (!confirm('Clear observed weight and all objects?')) return;
+      observed = 0;
+      items = [];
+      observedWeightInput.value = '';
+      recalcAndRender();
+    });
+
+    // Init
+    populateDropdown();
+    recalcAndRender();
+  });
+</script>
 </body>
 </html>
+
