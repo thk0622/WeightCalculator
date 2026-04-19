@@ -1,231 +1,539 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Weight Calculator</title>
-  <style>
-    :root { --primary: purple; --danger:purple; }
-    * { box-sizing: border-box; }
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0; padding: 0;
-      display: flex; justify-content: center; align-items: center;
-      min-height: 100vh; background-color: #f4f4f4;
-    }
-    .container {
-      background: #ffffff; padding: 20px; border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      max-width: 420px; width: 92%;
-    }
-    h1 { font-size: 20px; margin-bottom: 16px; color: #333; text-align: center; }
-    label { font-weight: bold; margin-top: 10px; display: block; }
-    input[type="number"], select {
-      width: 100%; padding: 10px; margin: 8px 0;
-      border: 1px solid #ccc; border-radius: 8px; font-size: 16px;
-    }
-    button {
-      width: 100%; padding: 12px; font-size: 16px;
-      background-color: var(--primary); color: white; border: none;
-      border-radius: 8px; cursor: pointer; margin-top: 10px;
-    }
-    button:hover { background-color: #483D8B; }
-    .reset-btn { background-color: var(--danger); }
-    .reset-btn:hover { background-color: #483D8B; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Weight Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1f2535;
+    --border: #2a3045;
+    --text: #e4e8f5;
+    --text-muted: #6b7694;
+    --accent: #4f9fff;
+    --danger: #ef4444;
+    --danger-bg: rgba(239,68,68,0.1);
+    --success: #22c55e;
+    --success-bg: rgba(34,197,94,0.1);
+    --warn: #f59e0b;
+  }
 
-    ul { padding-left: 0; margin: 10px 0 0; }
-    ul li {
-      list-style: none; padding: 8px 10px; background: #f1f1f1;
-      margin: 6px 0; border-radius: 6px; display:flex; align-items:center; justify-content:space-between; gap:10px;
-    }
-    .item-label { font-size: 14px; }
-    .remove-btn {
-      background: transparent; color: #dc3545; border: none;
-      font-size: 18px; width: auto; padding: 0 6px; cursor: pointer; line-height: 1;
-    }
-    .remove-btn:active { transform: scale(0.96); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    .stats {
-      margin-top: 12px; background:#fafafa; border:1px solid #eee; border-radius:8px; padding:10px;
-      display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size:14px;
-    }
-    .stats div { display:flex; justify-content:space-between; }
-    .result {
-      margin-top: 12px; font-size: 18px; font-weight: bold; color: #333; text-align: center;
-    }
-  </style>
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 32px 16px;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  /* Header */
+  .header {
+    margin-bottom: 28px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+
+  .subtitle {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    margin-top: 4px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 14px;
+  }
+
+  .card-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 12px;
+  }
+
+  /* Observed weight input */
+  .obs-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .obs-input-wrap {
+    flex: 1;
+    position: relative;
+  }
+
+  .obs-input-wrap input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 1.25rem;
+    font-weight: 500;
+    padding: 12px 52px 12px 16px;
+    outline: none;
+    transition: border-color 0.2s;
+    -moz-appearance: textfield;
+  }
+
+  .obs-input-wrap input::-webkit-outer-spin-button,
+  .obs-input-wrap input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  .obs-input-wrap input:focus { border-color: var(--accent); }
+
+  .obs-input-wrap input::placeholder { color: var(--text-muted); font-size: 0.95rem; }
+
+  .obs-unit {
+    position: absolute;
+    right: 14px; top: 50%;
+    transform: translateY(-50%);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  /* Object selector */
+  .add-row {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .select-wrap {
+    flex: 1;
+    position: relative;
+  }
+
+  select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    font-size: 0.85rem;
+    padding: 11px 36px 11px 14px;
+    outline: none;
+    appearance: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  select:focus { border-color: var(--accent); }
+
+  .select-arrow {
+    position: absolute;
+    right: 12px; top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+  }
+
+  /* Category optgroup styling is browser-limited, but we label them */
+
+  .btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    padding: 11px 18px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .btn-primary:hover { background: #3d8fe8; }
+  .btn-primary:active { transform: scale(0.97); }
+
+  .btn-danger {
+    background: var(--danger-bg);
+    border: 1px solid rgba(239,68,68,0.3);
+    color: var(--danger);
+    width: 100%;
+  }
+
+  .btn-danger:hover { background: rgba(239,68,68,0.2); }
+
+  /* Items list */
+  .items-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .items-list:empty::after {
+    content: 'No objects added yet';
+    display: block;
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    padding: 12px 0;
+  }
+
+  .item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    gap: 10px;
+    animation: slideIn 0.15s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .item-name {
+    font-size: 0.82rem;
+    color: var(--text);
+    flex: 1;
+    line-height: 1.3;
+  }
+
+  .item-weight {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .remove-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    line-height: 1;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .remove-btn:hover { color: var(--danger); background: var(--danger-bg); }
+
+  /* Stats + result */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .stat-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .stat-box.net { border-color: var(--accent); background: rgba(79,159,255,0.07); }
+  .stat-box.net .stat-label { color: var(--accent); }
+  .stat-box.net .stat-value { font-size: 1.3rem; color: var(--accent); }
+  .stat-box.net.negative { border-color: var(--warn); background: rgba(245,158,11,0.07); }
+  .stat-box.net.negative .stat-label { color: var(--warn); }
+  .stat-box.net.negative .stat-value { color: var(--warn); }
+
+  /* Search */
+  .search-wrap {
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  .search-wrap input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    font-size: 0.82rem;
+    padding: 8px 14px 8px 34px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-wrap input:focus { border-color: var(--accent); }
+  .search-wrap input::placeholder { color: var(--text-muted); }
+
+  .search-icon {
+    position: absolute;
+    left: 11px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    pointer-events: none;
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>Weight Calculator (kg)</h1>
+<div class="container">
 
-    <label for="observedWeight">Observed Weight:</label>
-    <input type="number" id="observedWeight" placeholder="Enter total weight (kg)" step="0.01" min="0" />
-
-    <label for="objectDropdown">Objects:</label>
-    <select id="objectDropdown">
-      <option value="" disabled selected>Select an object</option>
-    </select>
-    <button id="addWeightBtn">Add Object</button>
-
-    <ul id="objectWeightsList"></ul>
-
-    <div class="stats">
-      <div><span>Total objects (tare)</span><strong id="tare">0.00 kg</strong></div>
-      <div><span>Observed</span><strong id="obs">0.00 kg</strong></div>
-    </div>
-    <div class="result" id="result">Net Weight: 0.00 kg</div>
-
-    <button id="resetBtn" class="reset-btn">Reset</button>
+  <div class="header">
+    <h1>Weight Calculator</h1>
+    <p class="subtitle">// TARE SUBTRACTION — KG</p>
   </div>
 
- <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    // --- Object database (kg) ---
-    const objectDatabase = {
-      "Blanket": 0.675,
-      "Pillow (with case)": 0.63,
-      "Pillowcase Only": 0.035,
-      "Washcloth": 0.11,
-      "Towel": 0.215,
-      "Z-flo Foam Pillow Large": 1.25,
-      "Z-flo Foam Pillow Small": 0.66,
-      "WAFFLE pillow": 0.255,
-      "Full Swing": 1.8,
-      "Bed pad": 0.585,
-      "Standard Gown": 0.317,
-      "Bariatric Gown": 0.417,
-      "Bed Sheet": 0.38,
-      "Bariatric Bed Sheet": 0.79,
-      "Dryflow pad (standard size)": 0.12,
-      "Dryflow pad (full lenght)": 0.199,
-      "Chux or blue pads": 0.025,
-      "Locked Restraint (each)": 0.393,
-      "Restraint (pair)": 0.13,
-      "Bariatric Sock (pair)": 0.08,
-      "Gray Socks (pair)": 0.044,
-      "Abductor pillow": 1.05,
-      "heel Medix boot + wedge, standard": 0.469,
-      "Sage Boot, pediatric": 0.333,
-      "PFS small": 0.6,
-      "PFS medium": 0.7,
-      "PFS large": 0.8,
-      "Knee Immobilizer 20 in": 0.5,
-      "Knee Immobilizer 22 in": 0.8,
-      "Freedom Splint": 0.165,
-      "Mittens, Adult": 0.165,
-      "Waist Restraint": 0.538,
-      "SCD full set with machine": 6.6,
-      "Cooling Blanket": 1.5,
-      "Male Urinal": 0.04,
-      "Female Urinal": 0.081,
-      "Seizure pads (2)": 1.680,
-      "Prevalon air pump": 6.5,
-      "Airtap Sheet REG": 0.91,
-      "Airtap Sheet XXL": 0.95,
-      "Airtap Wedge REG(2 piece)": 0.871,
-      "Airtap Wedge XXL(2 piece)": 1.04
-    };
+  <!-- Observed weight -->
+  <div class="card">
+    <div class="card-label">Observed Weight</div>
+    <div class="obs-row">
+      <div class="obs-input-wrap">
+        <input type="number" id="observedWeight" placeholder="0.00" step="0.01" min="0"/>
+        <span class="obs-unit">kg</span>
+      </div>
+    </div>
+  </div>
 
-    // --- Elements ---
-    const objectDropdown = document.getElementById('objectDropdown');
-    const listEl = document.getElementById('objectWeightsList');
-    const resultEl = document.getElementById('result');
-    const tareEl = document.getElementById('tare') || (()=>{ const d=document.createElement('div'); return d; })();
-    const obsEl = document.getElementById('obs') || (()=>{ const d=document.createElement('div'); return d; })();
-    const observedWeightInput = document.getElementById('observedWeight');
-    const addWeightBtn = document.getElementById('addWeightBtn');
-    const resetBtn = document.getElementById('resetBtn');
+  <!-- Object adder -->
+  <div class="card">
+    <div class="card-label">Add Object (Tare)</div>
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="searchInput" placeholder="Filter objects…"/>
+    </div>
+    <div class="add-row">
+      <div class="select-wrap">
+        <select id="objectDropdown"></select>
+        <span class="select-arrow">▾</span>
+      </div>
+      <button class="btn btn-primary" id="addWeightBtn">+ Add</button>
+    </div>
+  </div>
 
-    // --- State ---
-    let items = []; // [{ name, weight }]
-    let observed = 0;
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-box">
+      <span class="stat-label">Observed</span>
+      <span class="stat-value" id="obsDisplay">0.00 kg</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tare Total</span>
+      <span class="stat-value" id="tareDisplay">0.00 kg</span>
+    </div>
+    <div class="stat-box net" id="netBox">
+      <span class="stat-label">Net Weight</span>
+      <span class="stat-value" id="netDisplay">0.00 kg</span>
+    </div>
+  </div>
 
-    // Populate dropdown safely
-    function populateDropdown() {
-      try {
-        objectDropdown.innerHTML = '<option value="" disabled selected>Select an object</option>';
-        const entries = Object.entries(objectDatabase);
-        if (!entries.length) throw new Error('Empty object database');
-        for (const [name, weight] of entries) {
-          const opt = document.createElement('option');
-          opt.value = name;
-          opt.textContent = `${name} (${weight} kg)`;
-          objectDropdown.appendChild(opt);
-        }
-      } catch (e) {
-        // Visible fallback if something blocks JS on device
-        objectDropdown.innerHTML = '<option value="" disabled selected>Objects unavailable</option>';
-      }
+  <!-- Items list -->
+  <div class="card">
+    <div class="card-label">Added Objects <span id="itemCount" style="color:var(--accent);font-family:'DM Mono',monospace"></span></div>
+    <ul class="items-list" id="objectWeightsList"></ul>
+  </div>
+
+  <!-- Reset -->
+  <button class="btn btn-danger" id="resetBtn">↺ Reset All</button>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+  var objectDatabase = {
+    "Blanket": 0.675,
+    "Pillow (with case)": 0.63,
+    "Pillowcase Only": 0.035,
+    "Washcloth": 0.11,
+    "Towel": 0.215,
+    "Z-flo Foam Pillow Large": 1.25,
+    "Z-flo Foam Pillow Small": 0.66,
+    "WAFFLE Pillow": 0.255,
+    "Full Swing": 1.8,
+    "Bed Pad": 0.585,
+    "Standard Gown": 0.317,
+    "Bariatric Gown": 0.417,
+    "Bed Sheet": 0.38,
+    "Bariatric Bed Sheet": 0.79,
+    "Dryflow Pad (standard)": 0.12,
+    "Dryflow Pad (full length)": 0.199,
+    "Chux / Blue Pad": 0.025,
+    "Locked Restraint (each)": 0.393,
+    "Restraint (pair)": 0.13,
+    "Bariatric Sock (pair)": 0.08,
+    "Gray Socks (pair)": 0.044,
+    "Abductor Pillow": 1.05,
+    "Heel Medix Boot + Wedge (std)": 0.469,
+    "Sage Boot (pediatric)": 0.333,
+    "PFS Small": 0.6,
+    "PFS Medium": 0.7,
+    "PFS Large": 0.8,
+    "Knee Immobilizer 20 in": 0.5,
+    "Knee Immobilizer 22 in": 0.8,
+    "Freedom Splint": 0.165,
+    "Mittens (adult)": 0.165,
+    "Waist Restraint": 0.538,
+    "SCD Full Set w/ Machine": 6.6,
+    "Cooling Blanket": 1.5,
+    "Male Urinal": 0.04,
+    "Female Urinal": 0.081,
+    "Seizure Pads (2)": 1.68,
+    "Prevalon Air Pump": 6.5,
+    "Airtap Sheet REG": 0.91,
+    "Airtap Sheet XXL": 0.95,
+    "Airtap Wedge REG (2-piece)": 0.871,
+    "Airtap Wedge XXL (2-piece)": 1.04
+  };
+
+  var allNames = Object.keys(objectDatabase);
+  var items = [];
+  var observed = 0;
+  var filterText = "";
+
+  var dropdown     = document.getElementById('objectDropdown');
+  var searchInput  = document.getElementById('searchInput');
+  var listEl       = document.getElementById('objectWeightsList');
+  var obsInput     = document.getElementById('observedWeight');
+  var obsDisplay   = document.getElementById('obsDisplay');
+  var tareDisplay  = document.getElementById('tareDisplay');
+  var netDisplay   = document.getElementById('netDisplay');
+  var netBox       = document.getElementById('netBox');
+  var itemCount    = document.getElementById('itemCount');
+
+  function populateDropdown() {
+    var filtered = allNames.filter(function(n) {
+      return n.toLowerCase().includes(filterText.toLowerCase());
+    });
+    dropdown.innerHTML = '';
+    if (!filtered.length) {
+      dropdown.innerHTML = '<option disabled>No matches</option>';
+      return;
     }
-
-    // Recalc & render
-    function recalcAndRender() {
-      const tare = items.reduce((sum, it) => sum + it.weight, 0);
-      const net = (observed || 0) - tare;
-
-      if (tareEl) tareEl.textContent = `${tare.toFixed(2)} kg`;
-      if (obsEl)  obsEl.textContent  = `${(observed || 0).toFixed(2)} kg`;
-      if (resultEl) resultEl.textContent = `Net Weight: ${net.toFixed(2)} kg`;
-
-      listEl.innerHTML = '';
-      items.forEach((it, idx) => {
-        const li = document.createElement('li');
-
-        const lbl = document.createElement('span');
-        lbl.className = 'item-label';
-        lbl.textContent = `${it.name}: ${it.weight.toFixed(2)} kg`;
-
-        const removeBtn = document.createElement('button');
-        removeBtn.className = 'remove-btn';
-        removeBtn.setAttribute('aria-label', 'Remove item');
-        removeBtn.textContent = '×';
-        removeBtn.onclick = () => {
-          items.splice(idx, 1);
-          recalcAndRender();
-        };
-
-        li.append(lbl, removeBtn);
-        listEl.appendChild(li);
-      });
-    }
-
-    // Events
-    addWeightBtn.addEventListener('click', () => {
-      const selected = objectDropdown.value;
-      if (!selected) { alert('Please select an object.'); return; }
-      const weight = objectDatabase[selected];
-      // guard if key missing (e.g., old cached code)
-      if (typeof weight !== 'number') { alert('Object weight not found. Try a hard refresh.'); return; }
-      items.push({ name: selected, weight });
-      recalcAndRender();
-      // Do NOT clear dropdown; user can tap Add again
+    filtered.forEach(function(name) {
+      var opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name + '  (' + objectDatabase[name].toFixed(3) + ' kg)';
+      dropdown.appendChild(opt);
     });
+  }
 
-    observedWeightInput.addEventListener('input', () => {
-      const v = parseFloat(observedWeightInput.value);
-      observed = Number.isFinite(v) && v >= 0 ? v : 0;
-      recalcAndRender();
+  function recalc() {
+    var tare = items.reduce(function(sum, it) { return sum + it.weight; }, 0);
+    var net = observed - tare;
+
+    obsDisplay.textContent  = observed.toFixed(2) + ' kg';
+    tareDisplay.textContent = tare.toFixed(2) + ' kg';
+    netDisplay.textContent  = net.toFixed(2) + ' kg';
+    itemCount.textContent   = items.length ? '(' + items.length + ')' : '';
+
+    netBox.classList.toggle('negative', net < 0);
+
+    listEl.innerHTML = '';
+    items.forEach(function(it, idx) {
+      var li = document.createElement('li');
+      li.className = 'item-row';
+
+      var nameEl = document.createElement('span');
+      nameEl.className = 'item-name';
+      nameEl.textContent = it.name;
+
+      var weightEl = document.createElement('span');
+      weightEl.className = 'item-weight';
+      weightEl.textContent = it.weight.toFixed(3) + ' kg';
+
+      var removeBtn = document.createElement('button');
+      removeBtn.className = 'remove-btn';
+      removeBtn.setAttribute('aria-label', 'Remove ' + it.name);
+      removeBtn.textContent = '×';
+      removeBtn.onclick = function() {
+        items.splice(idx, 1);
+        recalc();
+      };
+
+      li.append(nameEl, weightEl, removeBtn);
+      listEl.appendChild(li);
     });
+  }
 
-    resetBtn.addEventListener('click', () => {
-      if (!confirm('Clear observed weight and all objects?')) return;
-      observed = 0;
-      items = [];
-      observedWeightInput.value = '';
-      recalcAndRender();
-    });
-
-    // Init
+  searchInput.addEventListener('input', function() {
+    filterText = searchInput.value;
     populateDropdown();
-    recalcAndRender();
   });
+
+  document.getElementById('addWeightBtn').addEventListener('click', function() {
+    var selected = dropdown.value;
+    if (!selected || !objectDatabase.hasOwnProperty(selected)) return;
+    items.push({ name: selected, weight: objectDatabase[selected] });
+    recalc();
+  });
+
+  obsInput.addEventListener('input', function() {
+    var v = parseFloat(obsInput.value);
+    observed = (isFinite(v) && v >= 0) ? v : 0;
+    recalc();
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', function() {
+    if (!confirm('Clear all entries?')) return;
+    observed = 0; items = [];
+    obsInput.value = '';
+    recalc();
+  });
+
+  populateDropdown();
+  recalc();
+});
 </script>
 </body>
 </html>
-
-
-
-
-
-
