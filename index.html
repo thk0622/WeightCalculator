@@ -7,18 +7,22 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f1117;
-    --surface: #181c27;
-    --surface2: #1f2535;
-    --border: #2a3045;
-    --text: #e4e8f5;
-    --text-muted: #6b7694;
-    --accent: #4f9fff;
+    --bg: #0d0a14;
+    --surface: #160f24;
+    --surface2: #1e1530;
+    --border: #2e2248;
+    --text: #e8e4f2;
+    --text-muted: #7a6fa0;
+    --accent: #4B2E83;
+    --accent-bright: #6a45b8;
+    --accent-light: #8b6fd4;
+    --gold: #B7A57A;
+    --gold-dark: #85754D;
     --danger: #ef4444;
     --danger-bg: rgba(239,68,68,0.1);
     --success: #22c55e;
     --success-bg: rgba(34,197,94,0.1);
-    --warn: #f59e0b;
+    --warn: #B7A57A;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -54,9 +58,18 @@
   .subtitle {
     font-family: 'DM Mono', monospace;
     font-size: 0.72rem;
-    color: var(--text-muted);
+    color: var(--gold-dark);
     letter-spacing: 0.06em;
     margin-top: 4px;
+  }
+
+  /* UW paw accent bar */
+  .header-bar {
+    width: 40px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-bright), var(--gold));
+    border-radius: 2px;
+    margin-bottom: 10px;
   }
 
   /* Cards */
@@ -71,7 +84,7 @@
   .card-label {
     font-family: 'DM Mono', monospace;
     font-size: 0.65rem;
-    color: var(--text-muted);
+    color: var(--gold-dark);
     text-transform: uppercase;
     letter-spacing: 0.12em;
     margin-bottom: 12px;
@@ -107,7 +120,7 @@
   .obs-input-wrap input::-webkit-outer-spin-button,
   .obs-input-wrap input::-webkit-inner-spin-button { -webkit-appearance: none; }
 
-  .obs-input-wrap input:focus { border-color: var(--accent); }
+  .obs-input-wrap input:focus { border-color: var(--accent-bright); }
 
   .obs-input-wrap input::placeholder { color: var(--text-muted); font-size: 0.95rem; }
 
@@ -148,7 +161,7 @@
     transition: border-color 0.2s;
   }
 
-  select:focus { border-color: var(--accent); }
+  select:focus { border-color: var(--accent-bright); }
 
   .select-arrow {
     position: absolute;
@@ -158,8 +171,6 @@
     color: var(--text-muted);
     font-size: 0.7rem;
   }
-
-  /* Category optgroup styling is browser-limited, but we label them */
 
   .btn {
     font-family: 'DM Mono', monospace;
@@ -175,10 +186,11 @@
 
   .btn-primary {
     background: var(--accent);
-    color: #fff;
+    color: var(--gold);
+    border: 1px solid var(--accent-bright);
   }
 
-  .btn-primary:hover { background: #3d8fe8; }
+  .btn-primary:hover { background: var(--accent-bright); color: #fff; }
   .btn-primary:active { transform: scale(0.97); }
 
   .btn-danger {
@@ -287,12 +299,12 @@
     color: var(--text);
   }
 
-  .stat-box.net { border-color: var(--accent); background: rgba(79,159,255,0.07); }
-  .stat-box.net .stat-label { color: var(--accent); }
-  .stat-box.net .stat-value { font-size: 1.3rem; color: var(--accent); }
-  .stat-box.net.negative { border-color: var(--warn); background: rgba(245,158,11,0.07); }
-  .stat-box.net.negative .stat-label { color: var(--warn); }
-  .stat-box.net.negative .stat-value { color: var(--warn); }
+  .stat-box.net { border-color: var(--gold-dark); background: rgba(183,165,122,0.07); }
+  .stat-box.net .stat-label { color: var(--gold); }
+  .stat-box.net .stat-value { font-size: 1.3rem; color: var(--gold); }
+  .stat-box.net.negative { border-color: var(--danger); background: rgba(239,68,68,0.07); }
+  .stat-box.net.negative .stat-label { color: var(--danger); }
+  .stat-box.net.negative .stat-value { color: var(--danger); }
 
   /* Search */
   .search-wrap {
@@ -313,7 +325,7 @@
     transition: border-color 0.2s;
   }
 
-  .search-wrap input:focus { border-color: var(--accent); }
+  .search-wrap input:focus { border-color: var(--accent-bright); }
   .search-wrap input::placeholder { color: var(--text-muted); }
 
   .search-icon {
@@ -330,6 +342,7 @@
 <div class="container">
 
   <div class="header">
+    <div class="header-bar"></div>
     <h1>Weight Calculator</h1>
     <p class="subtitle">// TARE SUBTRACTION — KG</p>
   </div>
@@ -379,7 +392,7 @@
 
   <!-- Items list -->
   <div class="card">
-    <div class="card-label">Added Objects <span id="itemCount" style="color:var(--accent);font-family:'DM Mono',monospace"></span></div>
+    <div class="card-label">Added Objects <span id="itemCount" style="color:var(--gold);font-family:'DM Mono',monospace"></span></div>
     <ul class="items-list" id="objectWeightsList"></ul>
   </div>
 
